@@ -39,6 +39,7 @@ for x in dogs:
 # Monkey 2
 monkeys = os.listdir(os.getcwd() + "/CNN/data/monkey/")
 for x in monkeys:
+    print(x)
     imag=cv2.imread(os.getcwd() + "/CNN/data/monkey/" + x)
     img_from_ar = Image.fromarray(imag, 'RGB')
     resized_image = img_from_ar.resize((50, 50))
@@ -57,6 +58,7 @@ for x in parrots:
 # Elephant 4
 elephants = os.listdir(os.getcwd() + "/CNN/data/elephant/")
 for x in elephants:
+    print(x)
     imag=cv2.imread(os.getcwd() + "/CNN/data/elephant/" + x)
     img_from_ar = Image.fromarray(imag, 'RGB')
     resized_image = img_from_ar.resize((50, 50))
