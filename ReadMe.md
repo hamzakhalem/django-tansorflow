@@ -1,148 +1,59 @@
-# Tensored Django
+# Animal Classifier: Django + TensorFlow
 
-In this project we demonstrated how to use the tensorflow library to create a neural network that can be used to classify 6 different animals.
+A Django web app that recognises animals in photos. Upload a picture and a convolutional neural network trained with TensorFlow tells you if it's a cat, dog, monkey, parrot, elephant or bear.
 
-## Classes
+Built by following the [Academy Omen tensored-django tutorial](https://github.com/Academy-Omen/tensored-django) (MIT licence).
 
-```python
-LABELS
-Cat 0
-Dog 1
-Monkey 2
-Parrot 3
-Elephant 4
-Bear 5
-```
+## Features
 
-## Prerequisites
+- Upload a photo on the home page and get the predicted animal
+- Six classes: cat, dog, monkey, parrot, elephant, bear
+- A CNN built with Keras: three convolution layers and two max-pooling layers, then dense layers, on 50×50 colour images
+- Scripts to build the dataset from your own image folders and train the model
 
-- Knowledge in Python
-- Basic understanding of Django and the Web
+## How it works
 
-## Resources
+1. `CNN/load.py` reads the images from `CNN/data/<animal>/`, resizes them to 50×50 and saves them as `animals.npy` and `labels.npy`.
+2. `CNN/train.py` trains the CNN on those arrays and saves it as `model.h5`.
+3. The Django view resizes the uploaded photo the same way, loads `model.h5` and shows the class with the highest score.
 
-- [TensorFlow CNN Example](https://www.tensorflow.org/tutorials/images/cnn)
-- [Academy Omen Django Beginner's Tutorial](https://youtu.be/djNrEft8d_I)
+## Built with
 
-## Tools
+- Python 3, Django 4.0
+- TensorFlow, Keras
+- NumPy, OpenCV, Pillow
 
-- [Python 3](https://www.python.org) : The Python Programming Language
-- [Django](https://www.djangoproject.com) : The Web Framework for Python
-- [TensorFlow](https://www.tensorflow.org) : The TensorFlow Machine Learning Library used to create the neural network
-
-## Setup Instructions
-
-- Download and Install the latest Python 3 on your computer. [Install Now](https://www.python.org/downloads/)
-
-- Get the starter files [here](hhttps://github.com/Academy-Omen/tensored-django/tree/starter)
+## Run it locally
 
 ```bash
-# Download the start files or Clone the repository
-git clone https://github.com/Academy-Omen/tensored-django.git
-# switch to the starter branch
-cd tensored-django
-git checkout starter
-```
-
-- Create a virtual environment where all packages will be installed.
-
-```bash
-# Windows
-py -3 -m venv env
-# Linux and Mac
-python3 -m venv env
-```
-
-- Activate the virtual environment.
-
-```bash
-# Windows
-.\env\Scripts\activate
-# Linux and Mac
-source env/bin/activate
-```
-
-- Install all the required packages.
-
-```bash
+git clone https://github.com/hamzakhalem/django-tansorflow.git
+cd django-tansorflow
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
+export DJANGO_SECRET_KEY="any-long-random-string"   # PowerShell: $env:DJANGO_SECRET_KEY="..."
 ```
 
-## Prepare Dataset
-
-We are building an Image classifier that can predict if the inputed image is a Cat, Dog, Monkey, Parrot, Elephant or Bear. We therefore need images of these animals. The images are going to be used to train our algorithm on how to recognize these animals. This is a supervised machine learning algorithm aka just like a teacher teaching a kid on how to recognize different animals.
-
-We will used the [Download All Images Chrome Extension](https://chrome.google.com/webstore/detail/download-all-images/ifipmflagepipjokmbdecpmjbibjnakm?hl=en) which will help us download images automatically.
-
-## Label Dataset
-
-Just like a teacher will do, we will label each group of images so our kid (aka computer) can verify after performing a prediction.
-
-```python
-
-# temporal storage for labels and images
-data=[]
-labels=[]
-
-# Cat 0
-# Get the animal directory
-cats = os.listdir(os.getcwd() + "/CNN/data/cat")
-for x in cats:
-    """
-    Loop through all the images in the directory
-    1. Convert to arrays
-    2. Resize the images
-    3. Add image to dataset
-    4. Add the label
-    """
-    imag=cv2.imread(os.getcwd() + "/CNN/data/cat/" + x)
-    img_from_ar = Image.fromarray(imag, 'RGB')
-    resized_image = img_from_ar.resize((50, 50))
-    data.append(np.array(resized_image))
-    labels.append(0)
-
-# load in animals and labels
-animals=np.array(data)
-labels=np.array(labels)
-# save
-np.save("animals",animals)
-np.save("labels",labels)
-
-```
-
-## Train the Model
-
-We will use [TensorFlow CNN Example](https://www.tensorflow.org/tutorials/images/cnn) to create our own CNN. Feel free to read more and to fine-tune the algorithm. We start by separating the dataset into train_set (90%) and test_set (10%) which are used for training and validation respectively.
-
-```python
-# train through 100 times
-history = model.fit(x_train, y_train, epochs=100,
-                    validation_data=(x_test, y_test))
-
-# perform validation and get accuracy
-test_loss, test_acc = model.evaluate(x_test,  y_test, verbose=2)
-
-print(test_acc)
-
-# save the model or brain
-model.save("model.h5")
-```
-
-## Setup Django App
-
-- Create new django project
+The trained model isn't in the repo, so train it first. Put your images in `CNN/data/cat`, `CNN/data/dog`, `CNN/data/monkey`, `CNN/data/parrot`, `CNN/data/elephant` and `CNN/data/bear`, then:
 
 ```bash
-# create new project in the current directory
-django-admin startproject core .
-# run web app
-python manage.py runserver
-# visit http://localhost:8000/ on your browser
+python CNN/load.py
+python CNN/train.py
 ```
 
-- We will go ahead and update our settings.py file and then create a view that will perform the prediction and pass it to the frontend.
+Then start the app:
 
-## Let's Connect
+```bash
+python manage.py migrate
+python manage.py runserver
+```
 
-- [Twitter](https://twitter.com/itz_omen/)
-- [Youtube](https://www.youtube.com/channel/UCknaAfNfqKQDQFnqP2zMA6A)
+Open http://127.0.0.1:8000 and upload a photo.
+
+## Project structure
+
+```
+CNN/         Dataset loader, training script and a standalone prediction script
+core/        Django settings, URLs and the upload/predict view
+templates/   Upload page
+```
